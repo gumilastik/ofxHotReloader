@@ -1,4 +1,4 @@
-# ** SUPER HOT RELOAD FOR OF**
+# SUPER HOT RELOAD FOR OF
 
 -  **WINDOWS**: only change Configuration type to Dynamic Library (.dll) in project setting
 -  **OSX**: add new target Library to project (see https://forum.openframeworks.cc/t/can-i-change-empty-example-xcode-project-output-to-dylib/25456/3)
