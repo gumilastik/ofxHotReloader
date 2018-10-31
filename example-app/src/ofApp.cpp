@@ -1,0 +1,131 @@
+#include "ofApp.h"
+
+
+//--------------------------------------------------------------
+void ofApp::reload()
+{
+	// setup after loading
+	/*
+	if(!plugin) plugin = hotreloader.createPluginObject("MyPlugin");
+	if (!plugin2) plugin2 = hotreloader.createPluginObject("MyPlugin2");
+	*/
+
+	if (plugin) plugin->setup();
+	if (plugin2) plugin2->setup();
+}
+
+//--------------------------------------------------------------
+void ofApp::setup() { 
+
+#if defined (_WIN32) && !defined (_DEBUG)  
+	hotreloader.setup("../../../example-plugin/bin/example-plugin.dll");
+#elif defined (_WIN32) && defined (_DEBUG)  
+	hotreloader.setup("../../../example-plugin/bin/example-plugin_debug.dll");
+#elif defined (__APPLE__)
+	hotreloader.setup("../../../example-plugin/bin/libexample-plugin-dylib.dylib");
+#endif
+
+	plugin = hotreloader.createPluginObject("MyPlugin");
+	plugin2 = hotreloader.createPluginObject("MyPlugin2");
+
+	reload();
+
+	hotreloader.addCallbackOnLoaded(
+		[&]() -> void {
+			std::cout << "callback" << endl;
+			reload();
+		}
+	);
+}
+
+//--------------------------------------------------------------
+void ofApp::update() {
+
+	hotreloader.check();
+
+	if (plugin) {
+		float in[2] = { 2, 3 };
+		plugin->update(&in, &out);
+
+		plugin->custom("test");
+		plugin->custom("test2");
+	}
+
+	if (plugin2) {
+		
+		in2.a = 2;
+		in2.b = 3;
+		
+		plugin2->update(&in2, &out2);
+		plugin2->custom("test");
+	}
+}
+
+//--------------------------------------------------------------
+void ofApp::draw() {
+	if (plugin) plugin->draw();
+	if (plugin2) plugin2->draw();
+
+	ofDrawBitmapString("plugin update output  : " + ofToString(out), 10, 20);
+	ofDrawBitmapString("plugin2 update output : " + ofToString(out2.c), 10, 40);
+}
+
+//--------------------------------------------------------------
+void ofApp::exit() {
+	if (plugin) delete plugin;
+	if (plugin2) delete plugin2;
+}
+
+//--------------------------------------------------------------
+void ofApp::keyPressed(int key) {
+}
+
+//--------------------------------------------------------------
+void ofApp::keyReleased(int key) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseMoved(int x, int y) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseDragged(int x, int y, int button) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mousePressed(int x, int y, int button) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseReleased(int x, int y, int button) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseEntered(int x, int y) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::mouseExited(int x, int y) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::windowResized(int w, int h) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::gotMessage(ofMessage msg) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::dragEvent(ofDragInfo dragInfo) {
+
+}
