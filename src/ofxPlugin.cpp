@@ -1,6 +1,6 @@
 #include "ofxPlugin.h"
 
-ofxPlugin::ofxPlugin(ofxPluginBase * plugin, std::vector<ofxPlugin*>* plugins, string namePlugin) {
+ofxPlugin::ofxPlugin(ofxPluginBase * plugin, std::vector<ofxPlugin*>* plugins, std::string namePlugin) {
 	this->plugin = plugin;
 	this->plugins = plugins;
 	this->namePlugin = namePlugin;

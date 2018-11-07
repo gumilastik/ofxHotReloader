@@ -1,12 +1,27 @@
 #pragma once
 
+#if defined(_WIN32)
+#include <windows.h>
+#elif defined(__APPLE__)
+#endif
+
+#include <iostream>
+#include <ctime>
+
 #include "ofxPlugin.h"
- 
+#include "Utils.h"
+
 class ofxHotReloader {
 
 private:
-	typedef void(*FuncInitMainLoop)(void*);
-	FuncInitMainLoop funcInitMainLoop;
+	typedef void(*FuncInitGL)(void*);
+	FuncInitGL funcInitGL;
+
+	typedef void*(*FuncGetGL)(void);
+	FuncGetGL funcGetGL;
+
+	typedef void(*FuncDeinitGL)(void);
+	FuncDeinitGL funcDeinitGL;
 
 	typedef void*(*FuncCreatePlugin)(char*);
 	FuncCreatePlugin funcCreatePlugin;
@@ -14,35 +29,37 @@ private:
 	typedef std::function<void()> CallbackOnLoaded;
 	CallbackOnLoaded callbackOnLoaded;
 
-#ifdef _WIN32
+#if defined(_WIN32)
 	HINSTANCE instanceLib;
-#elif __APPLE__
+#elif defined(__APPLE__)
 	void* instanceLib;
 #endif
 
-	string nameTempDir;
+	std::string nameTempDir;
 
-	float timeLastUpdated;
-	float timeUpdateInterval;
+	unsigned long long timeLastUpdated;
+	unsigned long long timeUpdateInterval;
 
-	std::time_t tDest;
+	unsigned long long tDest;
 
-	string pathOriginalLib;
-	string pathOriginalPdb;
+    std::string pathPlugins;
+	std::string pathOriginalLib;
+	std::string pathOriginalPdb;
 	bool loaded;
 
 	std::vector<ofxPlugin*> plugins;
 
-	void clear();
-	void initMainLoop(void* ptr);
-	void generatePath(string pathDir, string& pathLib, string& pathPdb);
-	void load();
+	void initGL(void* ptr);
+	void* getGL();
+	void deinitGL();
+	void generatePath(std::string pathDir, std::string& pathLib, std::string& pathPdb);
+	void load(void* ptrPrevGL = nullptr);
 
 public:
 	ofxHotReloader();
 	~ofxHotReloader();
 
-	void setup(string pathOriginalLib, float timeUpdateInterval = 2000);
+	void setup(std::string pathOriginalLib, std::string pathPlugins, unsigned long long timeUpdateInterval = 2000);
 	void addCallbackOnLoaded(CallbackOnLoaded callbackOnLoaded);
 
 	void check(bool force = false);

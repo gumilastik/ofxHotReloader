@@ -39,24 +39,30 @@ public:
 
 
 	void draw(void* in, void* out) {
-		  
+		ofPushView();
+		ofPushMatrix();
 		ofPushStyle();
-	  
-        ofNoFill();
+
+		//ofSetupScreenOrtho(0, 0, 800, 600);
+
+		ofNoFill();
 		ofSetLineWidth(4);
-        ofSetColor(ofColor::red);
-        ofDrawCircle(a, b, 100);
- 
+		ofSetColor(ofColor::red);
+		ofDrawCircle(a, b, 100);
+
 		a += 0.1;
 		b += 0.2;
-	
+
 		if (a > 200) {
 			a = 0;
 			b = 0;
 		}
 
+
 		ofPopStyle();
-	} 
+		ofPopMatrix();
+		ofPopView();
+	}
 	 
 	void update(void* in, void* out) {
 		MyPlugin2DataIn& dataIn = *(MyPlugin2DataIn*)in;

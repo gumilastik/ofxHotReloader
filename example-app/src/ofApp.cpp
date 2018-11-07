@@ -18,11 +18,11 @@ void ofApp::reload()
 void ofApp::setup() { 
 
 #if defined (_WIN32) && !defined (_DEBUG)  
-	hotreloader.setup("../../../example-plugin/bin/example-plugin.dll");
+	hotreloader.setup("../../../example-plugin/bin/example-plugin.dll", Utils::getDirectoryPath("plugins"));
 #elif defined (_WIN32) && defined (_DEBUG)  
-	hotreloader.setup("../../../example-plugin/bin/example-plugin_debug.dll");
+	hotreloader.setup("../../../example-plugin/bin/example-plugin_debug.dll", Utils::getDirectoryPath("plugins"));
 #elif defined (__APPLE__)
-	hotreloader.setup("../../../example-plugin/bin/libexample-plugin-dylib.dylib");
+	hotreloader.setup("../../../example-plugin/bin/libexample-plugin.dylib", Utils::getDirectoryPath("plugins"));
 #endif
 
 	plugin = hotreloader.createPluginObject("MyPlugin");
@@ -32,10 +32,10 @@ void ofApp::setup() {
 
 	hotreloader.addCallbackOnLoaded(
 		[&]() -> void {
-			std::cout << "callback" << endl;
+			std::cout << "callback" << std::endl;
 			reload();
 		}
-	);
+	); 
 }
 
 //--------------------------------------------------------------

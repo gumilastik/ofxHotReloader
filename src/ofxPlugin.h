@@ -5,12 +5,12 @@
 class ofxPlugin {
 	ofxPluginBase* plugin;
 	std::vector<ofxPlugin*>* plugins;
-	string namePlugin;
+	std::string namePlugin;
 
 	friend class ofxHotReloader;
 
 public:
-	ofxPlugin(ofxPluginBase* plugin, std::vector<ofxPlugin*>* plugins, string namePlugin);
+	ofxPlugin(ofxPluginBase* plugin, std::vector<ofxPlugin*>* plugins, std::string namePlugin);
 	~ofxPlugin();
 
 	void setup(void* in = nullptr, void* out = nullptr);

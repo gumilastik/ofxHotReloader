@@ -35,13 +35,64 @@ void ofxPluginBase::custom(char * name, void * in, void * out) {
 	}
 }
 
-void initMainLoop(void* ptr)
+#if defined(JUCE_APP_VERSION)
+#else
+shared_ptr<ofMainLoop> ptrMainLoop;
+shared_ptr<ofAppBaseWindow> ptrAppWindow;
+#endif
+
+void initGL(void* ptr)
 {
-	ofSetMainLoop(shared_ptr<ofMainLoop>((ofMainLoop*)ptr));
+#if defined(JUCE_APP_VERSION)
+
+#else
+	if (ptr) {
+		ptrMainLoop = shared_ptr<ofMainLoop>((ofMainLoop*)ptr);
+		ptrAppWindow = ptrMainLoop.get()->getCurrentWindow();
+		ofSetMainLoop(ptrMainLoop);
+	}
+	else {
+		ptrMainLoop = shared_ptr<ofMainLoop>(new ofMainLoop());
+		ptrAppWindow = shared_ptr<ofAppBaseWindow>((ofAppBaseWindow*)(new ofAppGLFWWindow()));
+
+		ofWindowSettings settings;
+		settings.setSize(1, 1);
+
+		ptrAppWindow->setup(settings);
+
+		//window->renderer().reset(new ofGLRenderer(window));		
+		//	std::make_shared<ofGLRenderer>(this);
+
+		ptrMainLoop->setCurrentWindow(ptrAppWindow);
+		ofSetMainLoop(ptrMainLoop);
+
+		//ofScale
+		//ofViewport()
+	}
+#endif
+}
+
+void* getGL()
+{
+#if defined(JUCE_APP_VERSION)
+	return nullptr;
+#else
+	return ptrMainLoop.get();
+#endif
+}
+
+void deinitGL()
+{
+#if defined(JUCE_APP_VERSION)
+
+#else
+	//ptrAppWindow.reset();
+	//ptrMainLoop.reset();
+#endif
 }
 
 void* createPlugin(char* name)
-{
+{ 
 	ofxPluginBase* ptr = nullptr;
 
 	if (getMapOfConstrutors().find(name) != getMapOfConstrutors().end()) {
@@ -51,8 +102,12 @@ void* createPlugin(char* name)
 	return ptr;
 }
 
+void cloneGL()
+{
+}
+
 // lib entry point
-#ifdef _WIN32
+#if defined(_WIN32)
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
@@ -65,7 +120,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	}
 	return TRUE;
 }
-#elif __APPLE__
+#elif defined(__APPLE__)
 __attribute__((constructor)) void DllMain()
 {
 }
