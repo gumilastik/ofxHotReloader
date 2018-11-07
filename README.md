@@ -1,4 +1,4 @@
-#  HOT RELOADER for OF (and JUCE)**
+#  HOT RELOADER for OF (and JUCE)
 
 -  **WINDOWS**: only change Configuration type to Dynamic Library (.dll) in project setting
 Check C/C++ -> Code Generation -> Runtime Library need be same for plugin and app both
