@@ -7,11 +7,11 @@ class MyPlugin : public ofxPluginBase {
 	 
 public: 
 	MyPlugin() {
-		cout << "create MyPlugin" << endl;
+		cout << "creating MyPlugin" << endl;
 	}
 
 	~MyPlugin() {
-		cout << "delete MyPlugin" << endl;
+		cout << "deleting MyPlugin" << endl;
 	}
 	
 	void test(void* in, void* out) {

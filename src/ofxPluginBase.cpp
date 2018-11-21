@@ -20,19 +20,39 @@ void ofxPluginUtils::addCustomFunction(const std::type_info& type, char* name, o
 	getMapOfCustomFunctions()[std::make_pair<std::type_index, std::string>(type, name)] = func;
 }
 
+ofxPluginBase::ofxPluginBase() {
+}
+
+ofxPluginBase::~ofxPluginBase() {
+}
+
+ofxPluginBase * ofxPluginBase::getPtrPlugin() {
+	return this;
+}
+
 void ofxPluginBase::setup(void * in, void * out) {
 }
 
 void ofxPluginBase::update(void * in, void * out) {
 }
 
+void ofxPluginBase::process(void * in, void * out)
+{
+}
+
 void ofxPluginBase::draw(void * in, void * out) {
+}
+
+void ofxPluginBase::cleanup(void * in, void * out) {
 }
 
 void ofxPluginBase::custom(char * name, void * in, void * out) {
 	if (name != nullptr && getMapOfCustomFunctions().find(std::make_pair<std::type_index, std::string>(typeid(*this), name)) != getMapOfCustomFunctions().end()) {
 		(this->*getMapOfCustomFunctions()[std::make_pair<std::type_index, std::string>(typeid(*this), name)])(in, out);
 	}
+}
+
+void ofxPluginBase::clone(ofxPluginBase * obj) {
 }
 
 #if defined(JUCE_APP_VERSION)
@@ -91,7 +111,7 @@ void deinitGL()
 #endif
 }
 
-void* createPlugin(char* name)
+void* createPlugin(const char* name)
 { 
 	ofxPluginBase* ptr = nullptr;
 

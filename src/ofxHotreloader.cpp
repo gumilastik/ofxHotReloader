@@ -25,55 +25,64 @@ void ofxHotReloader::deinitGL() {
 }
 
 ofxHotReloader::ofxHotReloader() {
-    nameTempDir = "";
-    callbackOnLoaded = nullptr;
-    instanceLib = NULL;
-    
-    funcInitGL = NULL;
-    funcGetGL = NULL;
-    funcDeinitGL = NULL;
-    funcCreatePlugin = NULL;
-    
-    loaded = false;
+	nameTempDir = "";
+	callbackBeforeLoad = nullptr;
+	callbackAfterLoad = nullptr;
+	instanceLib = NULL;
+
+	funcInitGL = NULL;
+	funcGetGL = NULL;
+	funcDeinitGL = NULL;
+	funcCreatePlugin = NULL;
+
+	loaded = false;
 }
 
 ofxHotReloader::~ofxHotReloader() {
-    deinitGL();
-    
+	deinitGL();
+
 #ifdef _WIN32
-    if (instanceLib) {
-        FreeLibrary(instanceLib);
-    }
+	if (instanceLib) {
+		FreeLibrary(instanceLib);
+	}
 #elif __APPLE__
-    if (instanceLib) {
-        dlclose(instanceLib);
-    }
+	if (instanceLib) {
+		dlclose(instanceLib);
+	}
 #endif
-    
-    Utils::clearSubdirectories(pathPlugins);
+
+	Utils::clearSubdirectories(pathPlugins); 
 }
 
 // Utils::getDirectoryPath("plugins")
 void ofxHotReloader::setup(std::string pathOriginalLib, std::string pathPlugins, unsigned long long timeUpdateInterval) {
-    this->pathOriginalLib = Utils::getFileAbsolutePath(pathOriginalLib);
-    this->pathOriginalPdb = Utils::joinFilePath(Utils::getEnclosingDirectory(pathOriginalLib), Utils::getFileBaseName(pathOriginalLib) + ".pdb");
+	this->pathOriginalLib = Utils::getFileAbsolutePath(pathOriginalLib);
+	this->pathOriginalPdb = Utils::joinFilePath(Utils::getEnclosingDirectory(pathOriginalLib), Utils::getFileBaseName(pathOriginalLib) + ".pdb");
 
-    this->pathPlugins = pathPlugins;
-    this->timeUpdateInterval = timeUpdateInterval;
-    
-    Utils::clearSubdirectories(pathPlugins);
+	this->pathPlugins = pathPlugins;
+	this->timeUpdateInterval = timeUpdateInterval;
 
-    check(true);
+	Utils::clearSubdirectories(pathPlugins);
+
+	check(true);
+}
+
+void ofxHotReloader::addCallbackBeforeLoad(CallbackLoad callbackBeforeLoad) {
+	this->callbackBeforeLoad = callbackBeforeLoad;
+}
+
+void ofxHotReloader::addCallbackAfterLoad(CallbackLoad callbackAfterLoad) {
+	this->callbackAfterLoad = callbackAfterLoad;
 }
 
 void ofxHotReloader::generatePath(std::string pathDir, std::string & pathLib, std::string & pathPdb) {
 	Utils::createDirectory(pathDir);
 
-    pathLib = Utils::joinFilePath(Utils::getFileAbsolutePath(pathDir), Utils::getFileName(pathOriginalLib));
+	pathLib = Utils::joinFilePath(Utils::getFileAbsolutePath(pathDir), Utils::getFileName(pathOriginalLib));
 	pathPdb = Utils::joinFilePath(Utils::getEnclosingDirectory(pathLib), Utils::getFileBaseName(pathLib) + ".pdb");
 }
 
-void ofxHotReloader::load(void* ptrPrevGL) {
+bool ofxHotReloader::load(void* ptrPrevGL) {
 	std::string pathLib;
 	std::string pathPdb;
 
@@ -82,16 +91,18 @@ void ofxHotReloader::load(void* ptrPrevGL) {
 #ifdef _WIN32
 	instanceLib = LoadLibraryA(pathLib.c_str());
 #elif __APPLE__
-    // change id of dylib to temp id
-    Utils::Execute("install_name_tool -id /" + Utils::getFileBaseName(pathOriginalLib) + (nameTempDir != "" ? "." + nameTempDir : "") + "." + Utils::getFileExtension(pathOriginalLib) + " \"" + pathLib + "\"");
-    instanceLib = dlopen(pathLib.c_str(), RTLD_LAZY);
+	// change id of dylib to temp id
+	Utils::Execute("install_name_tool -id /" + Utils::getFileBaseName(pathOriginalLib) + (nameTempDir != "" ? "." + nameTempDir : "") + "." + Utils::getFileExtension(pathOriginalLib) + " \"" + pathLib + "\"");
+	instanceLib = dlopen(pathLib.c_str(), RTLD_LAZY);
 #endif
 
-    if (!instanceLib) {
+	if (!instanceLib) {
 #ifdef _WIN32
-        std::cout << "could not load the dynamic library: " << GetLastError() << std::endl;
+		std::cout << "could not load the dynamic library: " << pathLib << std::endl;
+		std::cout << "error: " << GetLastError() << std::endl;
 #elif __APPLE__
-        std::cout << "could not load the dynamic library: " << dlerror() << std::endl;
+		std::cout << "could not load the dynamic library: " << pathLib << std::endl;
+		std::cout << "error: " << dlerror() << " " << std::endl;
 #endif
 
 		funcInitGL = NULL;
@@ -120,96 +131,102 @@ void ofxHotReloader::load(void* ptrPrevGL) {
 		if (Utils::copyFileFromTo(pathOriginalLib, pathLib)) {
 			Utils::copyFileFromTo(pathOriginalPdb, pathPdb);
 		}
-        
+
 		loaded = true;
- 
+
 #if defined(JUCE_APP_VERSION)
 		initGL(ptrPrevGL);
 #else
 		initGL((void*)ofGetMainLoop().get());
 #endif
 
+		// callback before
+		if (callbackBeforeLoad) (callbackBeforeLoad)();
+
 		// hotswap
 		for (size_t i = 0; i < plugins.size(); i++) {
 			ofxPluginBase* ptr = (ofxPluginBase*)(funcCreatePlugin)((char*)plugins[i]->namePlugin.c_str());
 			ptr->clone(plugins[i]->plugin);
 
-            delete plugins[i]->plugin;
+			delete plugins[i]->plugin;
 			plugins[i]->plugin = ptr;
-		}
+		} 
 
-		// callback
-		if(callbackOnLoaded) (callbackOnLoaded)();
+		// callback after
+		if (callbackAfterLoad) (callbackAfterLoad)();
 	}
+
+	return loaded;
 }
 
-void ofxHotReloader::addCallbackOnLoaded(CallbackOnLoaded callbackOnLoaded) {
-	this->callbackOnLoaded = callbackOnLoaded;
-}
+bool ofxHotReloader::check(bool force) {
+	bool reloaded = false;
 
-void ofxHotReloader::check(bool force) {
 	if (force || Utils::getElapsedTimeMillis() - timeLastUpdated > timeUpdateInterval) {
 		if (!Utils::checkFileExits(pathOriginalLib)) {
 			if (!loaded) {
-				load();
+				reloaded = load();
 			}
-			return;
 		}
+		else {
+			unsigned long long tSrc = Utils::getFileModificationTime(pathOriginalLib);
 
-		unsigned long long tSrc = Utils::getFileModificationTime(pathOriginalLib);
+			std::string pathLib;
+			std::string pathPdb;
 
-		std::string pathLib;
-		std::string pathPdb;
-		
-		generatePath(Utils::joinFilePath(pathPlugins, nameTempDir), pathLib, pathPdb);
+			generatePath(Utils::joinFilePath(pathPlugins, nameTempDir), pathLib, pathPdb);
 
-		if (!Utils::checkFileExits(pathLib) || tSrc > tDest) {
+			if (!Utils::checkFileExits(pathLib) || tSrc > tDest) {
 
-			// check for open for read
-			FILE *fp = fopen(pathOriginalLib.c_str(), "rb");
-			if (fp != NULL) {
-				fclose(fp);
+				// check for open for read
+				FILE *fp = fopen(pathOriginalLib.c_str(), "rb");
+				if (fp != NULL) {
+					fclose(fp);
 
-				std::cout << "reload" << std::endl;
+					std::cout << "reload" << std::endl;
 
-				tDest = tSrc;
-				nameTempDir = std::to_string(tSrc);
+					tDest = tSrc;
+					nameTempDir = std::to_string(tSrc);
 
-				generatePath(Utils::joinFilePath(pathPlugins, nameTempDir), pathLib, pathPdb);
+					generatePath(Utils::joinFilePath(pathPlugins, nameTempDir), pathLib, pathPdb);
 
 #ifdef _WIN32
-				HINSTANCE instanceLibPrevious = instanceLib;
+					HINSTANCE instanceLibPrevious = instanceLib;
 #elif __APPLE__
-				void* instanceLibPrevious = instanceLib;
+					void* instanceLibPrevious = instanceLib;
 #endif
-				
-				if (Utils::copyFileFromTo(pathOriginalLib, pathLib)) {
-                    Utils::copyFileFromTo(pathOriginalPdb, pathPdb);
-					load(getGL());
-				}
-				
+
+					if (Utils::copyFileFromTo(pathOriginalLib, pathLib)) {
+						Utils::copyFileFromTo(pathOriginalPdb, pathPdb);
+						reloaded = load(getGL());
+					}
+
 #if defined(JUCE_APP_VERSION)
-				// disable for share GL context for JUCE
+					// disable for share GL context for JUCE
 #else
-				if (loaded) {
+					if (loaded) {
 #ifdef _WIN32
-					if (instanceLibPrevious) {
-						FreeLibrary(instanceLibPrevious);
-					}
+						if (instanceLibPrevious) {
+							FreeLibrary(instanceLibPrevious);
+						}
 #elif __APPLE__
-					if (instanceLibPrevious) {
-						dlclose(instanceLibPrevious);
+						if (instanceLibPrevious) {
+							dlclose(instanceLibPrevious);
+						}
+#endif
 					}
 #endif
 				}
-#endif
 			}
 		}
+
 		timeLastUpdated = Utils::getElapsedTimeMillis();
 	}
+
+	return reloaded;
 }
 
-ofxPlugin* ofxHotReloader::createPluginObject(char * namePlugin) {
+ofxPlugin* ofxHotReloader::createPluginObject(const char * namePlugin) {
 	if (!loaded || funcCreatePlugin == NULL) return nullptr;
 
 	ofxPluginBase* pluginBase = (ofxPluginBase*)(funcCreatePlugin)(namePlugin);

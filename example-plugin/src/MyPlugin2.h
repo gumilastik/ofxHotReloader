@@ -9,12 +9,12 @@ class MyPlugin2 : public ofxPluginBase {
 
 public: 
 	MyPlugin2() {
-		cout << "create MyPlugin2" << endl;
+		cout << "creating MyPlugin2" << endl;
 		 
 	}
 	 
 	~MyPlugin2() {
-		cout << "delete MyPlugin2" << endl;
+		cout << "deleting MyPlugin2" << endl;
 	}
 
 	void test(void* in, void* out) {

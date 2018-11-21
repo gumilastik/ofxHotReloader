@@ -4,11 +4,8 @@
 //--------------------------------------------------------------
 void ofApp::reload()
 {
-	// setup after loading
-	/*
-	if(!plugin) plugin = hotreloader.createPluginObject("MyPlugin");
+	if (!plugin) plugin = hotreloader.createPluginObject("MyPlugin");
 	if (!plugin2) plugin2 = hotreloader.createPluginObject("MyPlugin2");
-	*/
 
 	if (plugin) plugin->setup();
 	if (plugin2) plugin2->setup();
@@ -25,12 +22,9 @@ void ofApp::setup() {
 	hotreloader.setup("../../../example-plugin/bin/libexample-plugin.dylib", Utils::getDirectoryPath("plugins"));
 #endif
 
-	plugin = hotreloader.createPluginObject("MyPlugin");
-	plugin2 = hotreloader.createPluginObject("MyPlugin2");
-
 	reload();
 
-	hotreloader.addCallbackOnLoaded(
+	hotreloader.addCallbackAfterLoad(
 		[&]() -> void {
 			std::cout << "callback" << std::endl;
 			reload();

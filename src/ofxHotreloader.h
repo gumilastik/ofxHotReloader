@@ -23,11 +23,12 @@ private:
 	typedef void(*FuncDeinitGL)(void);
 	FuncDeinitGL funcDeinitGL;
 
-	typedef void*(*FuncCreatePlugin)(char*);
+	typedef void*(*FuncCreatePlugin)(const char*);
 	FuncCreatePlugin funcCreatePlugin;
 
-	typedef std::function<void()> CallbackOnLoaded;
-	CallbackOnLoaded callbackOnLoaded;
+	typedef std::function<void()> CallbackLoad;
+	CallbackLoad callbackBeforeLoad;
+	CallbackLoad callbackAfterLoad;
 
 #if defined(_WIN32)
 	HINSTANCE instanceLib;
@@ -53,15 +54,18 @@ private:
 	void* getGL();
 	void deinitGL();
 	void generatePath(std::string pathDir, std::string& pathLib, std::string& pathPdb);
-	void load(void* ptrPrevGL = nullptr);
+	bool load(void* ptrPrevGL = nullptr);
 
 public:
 	ofxHotReloader();
 	~ofxHotReloader();
 
-	void setup(std::string pathOriginalLib, std::string pathPlugins, unsigned long long timeUpdateInterval = 2000);
-	void addCallbackOnLoaded(CallbackOnLoaded callbackOnLoaded);
-
-	void check(bool force = false);
-	ofxPlugin* createPluginObject(char* namePlugin);
+	void setup(std::string pathOriginalLib, std::string pathPlugins = "plugins", unsigned long long timeUpdateInterval = 2000);
+	void addCallbackBeforeLoad(CallbackLoad callbackBeforeLoad);
+	void addCallbackAfterLoad(CallbackLoad callbackAfterLoad);
+	
+	bool check(bool force = false);
+	ofxPlugin* createPluginObject(const char* namePlugin);
 };
+
+

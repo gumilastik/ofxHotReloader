@@ -23,15 +23,20 @@ class ofxPluginBase {
 public:
 	typedef void(ofxPluginBase::*CustomFunc)(void*, void*);
 
-	ofxPluginBase() {}
-	virtual ~ofxPluginBase() {}
-	 
+	ofxPluginBase();
+	virtual ~ofxPluginBase();
+
+	virtual ofxPluginBase* getPtrPlugin();;
+
 	virtual void setup(void* in = nullptr, void* out = nullptr);
 	virtual void update(void* in = nullptr, void* out = nullptr);
+	virtual void process(void* in = nullptr, void* out = nullptr);
 	virtual void draw(void* in = nullptr, void* out = nullptr);
+	virtual void cleanup(void* in = nullptr, void* out = nullptr);
 
 	virtual void custom(char* name = nullptr, void* in = nullptr, void* out = nullptr);
-	virtual void clone(ofxPluginBase* obj) {};
+	virtual void clone(ofxPluginBase* obj);
+
 }; 
 
 namespace ofxPluginUtils {
@@ -49,5 +54,5 @@ extern "C" {
 	HOTRELOADER_API void initGL(void* ptr);
 	HOTRELOADER_API void* getGL();
 	HOTRELOADER_API void deinitGL();
-	HOTRELOADER_API void* createPlugin(char* name);
+	HOTRELOADER_API void* createPlugin(const char* name);
 }
