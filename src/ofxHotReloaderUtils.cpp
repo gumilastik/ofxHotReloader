@@ -1,6 +1,6 @@
-#include "Utils.h"
+#include "ofxHotReloaderUtils.h"
 
-void Utils::clearSubdirectories(std::string path) {
+void ofxHotReloaderUtils::clearSubdirectories(std::string path) {
 #if defined(JUCE_APP_VERSION)
 	juce::Array<juce::File> files = juce::File(path).findChildFiles(File::TypesOfFileToFind::findFilesAndDirectories, true);
 	for (size_t i = 0; i < files.size(); i++) {
@@ -19,7 +19,7 @@ void Utils::clearSubdirectories(std::string path) {
 #endif
 }
 
-void Utils::createDirectory(std::string pathDir) {
+void ofxHotReloaderUtils::createDirectory(std::string pathDir) {
 #if defined(JUCE_APP_VERSION)
 	juce::File file(pathDir);
 	if (!file.exists()) file.createDirectory();
@@ -29,7 +29,7 @@ void Utils::createDirectory(std::string pathDir) {
 #endif
 }
 
-std::string Utils::getDirectoryPath(std::string path) {
+std::string ofxHotReloaderUtils::getDirectoryPath(std::string path) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File::getCurrentWorkingDirectory().getChildFile(path).getFullPathName().toStdString();
 #else
@@ -37,7 +37,7 @@ std::string Utils::getDirectoryPath(std::string path) {
 #endif
 }
 
-bool Utils::checkFileExits(std::string path) {
+bool ofxHotReloaderUtils::checkFileExits(std::string path) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File(path).exists();
 #else
@@ -45,7 +45,7 @@ bool Utils::checkFileExits(std::string path) {
 #endif
 }
 
-bool Utils::copyFileFromTo(std::string from, std::string to) {
+bool ofxHotReloaderUtils::copyFileFromTo(std::string from, std::string to) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File(from).copyFileTo(juce::File(to));
 #else
@@ -53,7 +53,7 @@ bool Utils::copyFileFromTo(std::string from, std::string to) {
 #endif
 }
 
-std::string Utils::joinFilePath(std::string path1, std::string path2) {
+std::string ofxHotReloaderUtils::joinFilePath(std::string path1, std::string path2) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File(path1).getChildFile(path2).getFullPathName().toStdString();
 #else
@@ -61,7 +61,7 @@ std::string Utils::joinFilePath(std::string path1, std::string path2) {
 #endif
 }
 
-std::string Utils::getFileAbsolutePath(std::string path) {
+std::string ofxHotReloaderUtils::getFileAbsolutePath(std::string path) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File(path).getFullPathName().toStdString();
 #else
@@ -69,7 +69,7 @@ std::string Utils::getFileAbsolutePath(std::string path) {
 #endif
 }
 
-std::string Utils::getFileName(std::string path) {
+std::string ofxHotReloaderUtils::getFileName(std::string path) {
 #if defined(JUCE_APP_VERSION)
     return juce::File(path).getFileName().toStdString();
 #else
@@ -77,7 +77,7 @@ std::string Utils::getFileName(std::string path) {
 #endif
 }
 
-std::string Utils::getFileExtension(std::string path) {
+std::string ofxHotReloaderUtils::getFileExtension(std::string path) {
 #if defined(JUCE_APP_VERSION)
     return juce::File(path).getFileExtension().toStdString();
 #else
@@ -85,7 +85,7 @@ std::string Utils::getFileExtension(std::string path) {
 #endif
 }
 
-std::string Utils::getEnclosingDirectory(std::string path) {
+std::string ofxHotReloaderUtils::getEnclosingDirectory(std::string path) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File(path).getParentDirectory().getFullPathName().toStdString();
 #else
@@ -93,7 +93,7 @@ std::string Utils::getEnclosingDirectory(std::string path) {
 #endif
 }
 
-std::string Utils::getFileBaseName(std::string path) {
+std::string ofxHotReloaderUtils::getFileBaseName(std::string path) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File(path).getFileNameWithoutExtension().toStdString();
 #else
@@ -101,7 +101,7 @@ std::string Utils::getFileBaseName(std::string path) {
 #endif
 }
 
-unsigned long long Utils::getFileModificationTime(std::string path) {
+unsigned long long ofxHotReloaderUtils::getFileModificationTime(std::string path) {
 #if defined(JUCE_APP_VERSION)
 	return juce::File(path).getLastModificationTime().toMilliseconds();
 #else
@@ -109,7 +109,7 @@ unsigned long long Utils::getFileModificationTime(std::string path) {
 #endif
 }
 
-unsigned long long Utils::getElapsedTimeMillis() {
+unsigned long long ofxHotReloaderUtils::getElapsedTimeMillis() {
 #if defined(JUCE_APP_VERSION)
 	return juce::Time::currentTimeMillis();
 #else
@@ -117,7 +117,7 @@ unsigned long long Utils::getElapsedTimeMillis() {
 #endif
 }
 
-void Utils::Execute(std::string command) {
+void ofxHotReloaderUtils::Execute(std::string command) {
 #if defined(_WIN32)
 	ShellExecuteA(NULL, NULL, command.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #elif defined(__APPLE__)

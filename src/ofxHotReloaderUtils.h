@@ -13,7 +13,7 @@
 #elif defined(__APPLE__)
 #endif
 
-namespace Utils {
+namespace ofxHotReloaderUtils {
 	void clearSubdirectories(std::string path);
 	void createDirectory(std::string pathDir);
 	std::string getDirectoryPath(std::string path);

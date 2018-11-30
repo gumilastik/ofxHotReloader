@@ -5,14 +5,9 @@
 #elif defined(__APPLE__)
 #endif
 
-#include <iostream>
-#include <ctime>
-
 #include "ofxPlugin.h"
-#include "Utils.h"
 
 class ofxHotReloader {
-
 private:
 	typedef void(*FuncInitGL)(void*);
 	FuncInitGL funcInitGL;
@@ -43,7 +38,7 @@ private:
 
 	unsigned long long tDest;
 
-    std::string pathPlugins;
+    std::string pathPluginsFolder;
 	std::string pathOriginalLib;
 	std::string pathOriginalPdb;
 	bool loaded;
@@ -60,7 +55,7 @@ public:
 	ofxHotReloader();
 	~ofxHotReloader();
 
-	void setup(std::string pathOriginalLib, std::string pathPlugins = "plugins", unsigned long long timeUpdateInterval = 2000);
+	void setup(std::string pathOriginalLibFolder, std::string pathOriginalLibName, std::string pathPluginsFolder = "plugins", unsigned long long timeUpdateInterval = 2000);
 	void addCallbackBeforeLoad(CallbackLoad callbackBeforeLoad);
 	void addCallbackAfterLoad(CallbackLoad callbackAfterLoad);
 	

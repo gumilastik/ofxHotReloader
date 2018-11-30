@@ -14,13 +14,7 @@ void ofApp::reload()
 //--------------------------------------------------------------
 void ofApp::setup() { 
 
-#if defined (_WIN32) && !defined (_DEBUG)  
-	hotreloader.setup("../../../example-plugin/bin/example-plugin.dll", Utils::getDirectoryPath("plugins"));
-#elif defined (_WIN32) && defined (_DEBUG)  
-	hotreloader.setup("../../../example-plugin/bin/example-plugin_debug.dll", Utils::getDirectoryPath("plugins"));
-#elif defined (__APPLE__)
-	hotreloader.setup("../../../example-plugin/bin/libexample-plugin.dylib", Utils::getDirectoryPath("plugins"));
-#endif
+	hotreloader.setup("../../../example-plugin/bin/", "example-plugin", "plugins");
 
 	reload();
 
