@@ -79,12 +79,8 @@ public:
 	}
 }; 
 
-static int MyPlugin2Loader = ([]() {
-
-	ofxPluginUtils::addCustomFunction(typeid(MyPlugin2), "test", (ofxPluginBase::CustomFunc)&MyPlugin2::test);
-
-	ofxPluginUtils::addConstrutor("MyPlugin2", []() {
-		return new MyPlugin2();
-	});
-
-}(), 0);
+PLUGIN_LOADER_WITH_FUNCTIONS(MyPlugin2,
+	{
+		PLUGIN_ADD_FUNCTION(MyPlugin2, test);
+	}
+);

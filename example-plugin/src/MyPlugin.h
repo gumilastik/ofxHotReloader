@@ -65,13 +65,8 @@ public:
 	}
 }; 
 
-
-static int MyPluginLoader = ([]() {
-
-	ofxPluginUtils::addCustomFunction(typeid(MyPlugin), "test", (ofxPluginBase::CustomFunc)&MyPlugin::test);
-
-	ofxPluginUtils::addConstrutor("MyPlugin", []() {
-		return new MyPlugin();
-	});
-
-}(), 0);
+PLUGIN_LOADER_WITH_FUNCTIONS(MyPlugin,
+	{
+		PLUGIN_ADD_FUNCTION(MyPlugin, test);
+	}
+);

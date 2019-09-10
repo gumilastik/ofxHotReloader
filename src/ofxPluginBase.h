@@ -19,6 +19,28 @@
 #include "ofMain.h"
 #endif
 
+#define PLUGIN_ADD_FUNCTION(className, funcName) ofxPluginUtils::addCustomFunction(typeid(className), #funcName, (ofxPluginBase::CustomFunc)&className::funcName)
+
+#define PLUGIN_ADD_CONSTRUCTOR(className) \
+	ofxPluginUtils::addConstrutor(#className, []() { \
+		return new className(); \
+	});
+
+#define PLUGIN_LOADER(className) \
+static int _loader_##className = ([]() { \
+ \
+PLUGIN_ADD_CONSTRUCTOR(className) \
+ \
+}(), 0);
+
+#define PLUGIN_LOADER_WITH_FUNCTIONS(className, code) \
+static int _loader_##className = ([]() { \
+ \
+PLUGIN_ADD_CONSTRUCTOR(className) \
+code \
+ \
+}(), 0);
+
 class ofxPluginBase {
 public:
 	typedef void(ofxPluginBase::*CustomFunc)(void*, void*);
