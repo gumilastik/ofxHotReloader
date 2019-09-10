@@ -23,10 +23,15 @@ public:
 
 	void draw(void* in, void* out) override {
 		ofPushView();
+
+		// for JUCE
+		if (in != nullptr) {
+			float(&fIn)[2] = *reinterpret_cast<float(*)[2]>(in);
+			ofSetupScreenOrtho(fIn[0], fIn[1]);
+		}
+
 		ofPushMatrix();
 		ofPushStyle();
-
-		//ofSetupScreenOrtho(800, 600);
 
         ofSetColor(ofColor::forestGreen); // pink , forestGreen
 		ofDrawRectangle(a + 200, b, 200, 100);

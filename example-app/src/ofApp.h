@@ -4,11 +4,14 @@
 #include "ofxHotReloader.h"
 #include "../../example-plugin/src/MyPlugin2Data.h"
 
+#include "../../example-plugin/src/MyPlugin.h" // use plugin without reloader
+
 class ofApp : public ofBaseApp {
 
 	ofxHotReloader hotreloader;
 	ofxPlugin* plugin;
 	ofxPlugin* plugin2;
+	ofxPluginBase* plugin3;
 
 	MyPlugin2DataIn in2;
 	MyPlugin2DataOut out2;

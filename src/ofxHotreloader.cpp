@@ -1,4 +1,4 @@
-#include "ofxHotreloader.h"
+#include "ofxHotReloader.h"
 #include "ofxHotReloaderUtils.h"
 
 #if defined(_WIN32)
@@ -40,6 +40,8 @@ ofxHotReloader::ofxHotReloader() {
 	funcDeinitGL = NULL;
 	funcCreatePlugin = NULL;
 
+	tDest = 0;
+
 	loaded = false;
 }
 
@@ -62,11 +64,11 @@ ofxHotReloader::~ofxHotReloader() {
 // ofxHotReloaderUtils::getDirectoryPath("plugins")
 void ofxHotReloader::setup(std::string pathOriginalLibFolder, std::string pathOriginalLibName, std::string pathPluginsFolder, unsigned long long timeUpdateInterval) {
 #if defined (_WIN32) && !defined (_DEBUG)  
-	string pathOriginalLibFilename = pathOriginalLibName + ".dll";
+	std::string pathOriginalLibFilename = pathOriginalLibName + ".dll";
 #elif defined (_WIN32) && defined (_DEBUG)  
-	string pathOriginalLibFilename = pathOriginalLibName + "_debug.dll";
+	std::string pathOriginalLibFilename = pathOriginalLibName + "_debug.dll";
 #elif defined (__APPLE__)
-	string pathOriginalLibFilename = "lib" + pathOriginalLibName + ".dylib";
+	std::string pathOriginalLibFilename = "lib" + pathOriginalLibName + ".dylib";
 #endif
 
 	this->pathOriginalLib = ofxHotReloaderUtils::getFileAbsolutePath(ofxHotReloaderUtils::joinFilePath(pathOriginalLibFolder, pathOriginalLibFilename));
@@ -142,8 +144,10 @@ bool ofxHotReloader::load(void* ptrPrevGL) {
 		generatePath(pathPluginsFolder, pathLib, pathPdb);
 
 		if (ofxHotReloaderUtils::copyFileFromTo(pathOriginalLib, pathLib)) {
+#ifdef _WIN32
 			ofxHotReloaderUtils::copyFileFromTo(pathOriginalPdb, pathPdb);
-		}
+#endif
+        }
 
 		loaded = true;
 
@@ -210,8 +214,10 @@ bool ofxHotReloader::check(bool force) {
 #endif
 
 					if (ofxHotReloaderUtils::copyFileFromTo(pathOriginalLib, pathLib)) {
+#ifdef _WIN32
 						ofxHotReloaderUtils::copyFileFromTo(pathOriginalPdb, pathPdb);
-						reloaded = load(getGL());
+#endif
+                        reloaded = load(getGL());
 					}
 
 #if defined(JUCE_APP_VERSION)
